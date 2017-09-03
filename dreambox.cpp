@@ -144,7 +144,6 @@ void Dreambox_Connect(void)
 #endif
 			break;
 		}
-		WDG_RST;
 		reply = dm_client.connect(dm_ip[dm_device], dm_port);
 		if ( reply>0 ) break;
 		else  delay(100);

@@ -8,14 +8,11 @@
 
 //#define Serial Serial3
 
-//#define WDG_RST  asm("wdr")
-#define WDG_RST 
-
 #define USE_RS485 1
 
 // Pin mapping:
 // ---------------------------
-// Ethernet SPI CS: PA3 - set in "w5100.h"
+// Ethernet SPI CS: PA3
 // Ethernet reset:  PA2
 // SD-Card SPI CS:  PA4
 // RS485 direction: PA8

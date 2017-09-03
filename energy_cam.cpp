@@ -149,7 +149,6 @@ void EC_Connect(void)
 #endif
 			break;
 		}
-		WDG_RST;
 		reply = ec_client.connect(ec_ip, ec_port);
 		if ( reply>0 ) break;
 		else  delay(100);
@@ -213,7 +212,6 @@ void SendFrame(uint8_t fr_nr)
 	}
 	Serial.println();
 #endif
-	while ( (millis()-startDelay)<2 ) WDG_RST;	// wait for frame delay
 	// prepare to send
 #ifdef USE_RS485
 	RS485_ENABLE_TX;
@@ -257,7 +255,6 @@ void EC_ReadOCRStatus(void)
 #define EC_STATUS_TIMEOUT	10000	// millis
 	timeout = millis();	// up to 10 seconds to wait till completion
 	while (1) {
-		WDG_RST;
 		SendFrame(EC_FRAME_READ_OCR_STATUS);
 		if ( mb_state==MB_OK ) {
 			if ( frame[4]==EC_RESULT_OCR_OK1 || frame[4]==EC_RESULT_OCR_OK3 )
@@ -353,7 +350,6 @@ void Modbus_WaitForReply(void)
 	{
 		while ( ec_client.available() )
 		{
-			WDG_RST;  // avoid reset
 			// The maximum number of bytes is limited to the serial buffer size of BUFFER_SIZE.
 			// If more bytes is received than BUFFER_SIZE, the overflow flag will be set and
 			// the serial buffer will be flushed as long as the slave is still responding.
@@ -391,14 +387,12 @@ void Modbus_WaitForReply(void)
 		}
 
 		////////// END OF FRAME RECPTION //////////
-		WDG_RST;  // avoid reset
 
 		// The minimum buffer size from a slave can be an exception response of 5 bytes.
 		// If the buffer was partially filled set a frame_error.
 		if ( buffer>0 )
 			ProcessError(WRONG_FRAME_LEN);	// too few bytes received
 	}
-	WDG_RST;  // avoid reset
 	if ( buffer==0 )
 		ProcessError(REPLY_TIMEOUT);	// timeout error, no data received
 	startDelay = millis(); // starting delay

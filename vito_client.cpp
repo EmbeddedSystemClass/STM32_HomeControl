@@ -124,7 +124,6 @@ byte VitoClient_ResetPoll(void)
 #endif
 	byte i = MAX_RETRY, ret = 0;
 	while ( ret==0 && (i--)>0 ) {
-		WDG_RST;
 		while ( vito_client.available() ) vito_client.read();  // empty receive buffer
 		vito_client.waitForEOT(); //vito_client.flush();  // empty transmit buffer
 		if ( VitoClient_Connect()!=1 ) continue;	// connection error
@@ -142,11 +141,9 @@ byte VitoClient_ResetPoll(void)
 #endif
 		vito_client.write(dBuf, 3);  // reset polling
 		// wait for answer 06
-		WDG_RST;
 		ret = VitoClient_GetReply(1);
 	}
 	if ( ret==0 ) {	// error occurred
-		WDG_RST;
 #if _DEBUG_>0
 		Serial.println(("ERROR: Vito_ResetPoll: polling could not be stopped!"));
 #endif
@@ -182,7 +179,6 @@ byte VitoClient_GetReply(byte chrs)
 #else
 	while ( vito_client.connected() && ret==0 ) {
 #endif
-		WDG_RST;
 		if ( (millis()-time2)>VITO_REPLY_TIMEOUT ) {	// try up to 3 seconds
 #if _DEBUG_>0
 			Serial.println(F("ERROR: VitoClient_GetReply: reply from Vito timed out!"));
@@ -387,7 +383,6 @@ byte VitoClient_Connect(void)
 	// if you get a connection, report back via serial:
 	uint32_t time = millis()+5000;  // time within to get reply
 	while (1) {
-		WDG_RST;
 		repl = vito_client.connect(vito_ip, vito_port);
 		if ( repl>0 ) break;
 		if ( millis()>time ) {  // if no answer received within the prescribed time

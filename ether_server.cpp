@@ -43,16 +43,12 @@ void EtherServer_Init(void)
 /*****************************************************************************/
 void EtherServer_ReceiveData(EthernetClient cli)
 {
-#if _DEBUG_>1
-	Serial.print(F("ether server received: "));
-#endif
-	char c;
 	byte eol = 0;
 	s_ind = 0;
    // read and store the first header line only
-	while ( cli.connected() && cli.available() )
-	{
-      c = cli.read();
+  if ( cli.connected() ) {
+	while ( cli.available() ) {
+		char c = cli.read();
 #if _DEBUG_>1
 //    if ( s_line>0 )  Serial.write(c);
 #endif
@@ -65,9 +61,11 @@ void EtherServer_ReceiveData(EthernetClient cli)
 		}
 		s_buf[s_ind++] = c;	// store here the data
 	}
+  }
 
 #if _DEBUG_>0
-   Serial.println(s_buf);
+	Serial.print(("ether server received: "));
+	Serial.println(s_buf);
 #endif
 }
 /*****************************************************************************/
@@ -97,10 +95,9 @@ void EtherServer_CheckForClient(void)
 		if ( allow )  accessTimeout = millis() + 5*60*1000;  // renew time-out if it is registered IP
 	} else {
 		// new client. check if it is already recorded
-		byte i=0,found=0;
-		for (; i<100; i++) {
-			WDG_RST;
-			strcpy_P(s_buf, PSTR("clients.txt"));
+		byte found=0;
+		for (byte i=0; i<100; i++) {
+			strcpy_P(s_buf, ("clients.txt"));
 			File_GetFileLine(i);  // the input file name is in f_buf, the read line is returned also in f_buf
 			if ( s_buf[0]==0 ) break;
 			// the line is in s_buf. parse the IP address

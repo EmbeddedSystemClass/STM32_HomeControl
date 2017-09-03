@@ -372,7 +372,6 @@ dir_t dir;
 	// This code is just copied from SdFile.cpp (lsPrintNext) of the SDFat library
 	while ( file.readDir(&dir) > 0 )
 	{
-		WDG_RST;	// avoid WDG reset
 		// done if past last used entry
 		if (dir.name[0] == DIR_NAME_FREE) break;
 		// skip deleted entry and entries for . and  ..
@@ -436,7 +435,6 @@ dir_t dir;
 	// This code is just copied from SdFile.cpp (lsPrintNext) of the SDFat library
 	while (file.readDir(&dir) > 0)
 	{
-		WDG_RST;	// avoid WDG reset
 		// done if past last used entry
 		if (dir.name[0] == DIR_NAME_FREE) break;
 		// skip deleted entry and entries for . and  ..
@@ -466,7 +464,6 @@ void File_LoadFileLine(void)
 {
   #define MINIMUM_BYTES 50
   // loads a minimum of 50 bytes to increase transmission efficiency
-  WDG_RST;  // avoid WDG reset
   f_buf[0] = 0;
   if ( file.fgets(f_buf, MINIMUM_BYTES, (char*)"")==MINIMUM_BYTES ) {
     file.fgets(f_buf+MINIMUM_BYTES, SERVER_BUFFER_MAX_SIZE-MINIMUM_BYTES, (char*)"\n");
@@ -504,7 +501,6 @@ void File_SendFile(EthernetClient cl)
 	// sending data in binary mode
 	byte c;
 	while ( (c = file.read(f_buf, sizeof(f_buf)-1))> 0 ) {
-		WDG_RST;  // avoid WDG reset
 		cl.write(f_buf, c);
 	}
 	file.close();  // close root.

@@ -76,8 +76,7 @@ static char * nist_server = "nist.netservicesgroup.com";
 #endif
         break;
       }
-        WDG_RST;
-	repl = time_client.connect(nist_server, nist_port);  // NIST time server
+        repl = time_client.connect(nist_server, nist_port);  // NIST time server
         if ( repl>0 ) break;
         else  delay(100);
     }
@@ -159,7 +158,6 @@ void Time_CheckTCP(void)
   ctime = millis();  // time within to get reply
   while ( time_client.connected() )
   {
-    WDG_RST;
     if ( (millis()-ctime)>TIMEOUT_REPLY ) {  // if no answer received within the prescribed time
 #if _DEBUG_>0
       Serial.println(F("Client reply timed out, giving up."));
