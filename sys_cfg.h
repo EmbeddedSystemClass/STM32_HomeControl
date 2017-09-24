@@ -38,11 +38,8 @@
 
 #define ETHERNET_SPI_CS_PIN	PA3
 #define ETHERNET_RESET_PIN	PA2
-#define ETHERNET_RESET_PIN_MODE_SET_TO_OUTPUT	pinMode(ETHERNET_RESET_PIN, OUTPUT)	// set PE6 to output
-#define ETHERNET_RESET_PIN_SET_TO_LOW			digitalWrite(ETHERNET_RESET_PIN, LOW)	//asm("cbi 0x03, 6")
-#define ETHERNET_RESET_PIN_SET_TO_HIGH			digitalWrite(ETHERNET_RESET_PIN, HIGH)	//asm("sbi 0x03, 6")
 
-extern void showSocketStatus(void);
+inline void showSocketStatus(void) {}
 
 #endif
 

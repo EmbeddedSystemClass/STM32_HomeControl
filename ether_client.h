@@ -3,7 +3,7 @@
 #define _ETHER_CLIENT_H_
 
 
-#include <Ethernet_STM.h>
+#include <Ethernet_STM32.h>
 
 typedef enum {CLIENT_DREAMBOX} ether_client_id_t;	// add here further clients
 

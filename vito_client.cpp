@@ -1,11 +1,6 @@
 #include "sys_cfg.h"
 #include "vito_client.h"
-/*
-#ifndef USE_RS485
- #include <Ethernet.h>
-#endif
-*/
-#include <Time_lib.h>
+#include <TimeLib.h>
 #include "vito.h"
 #include "file_client.h"
 
@@ -61,8 +56,8 @@ char * VitoClient_GetParameterValue(char * paramName)
 /*****************************************************************************/
 void VitoClient_CheckDHW(void)
 {
-	// check weekday and time
-	if ( weekday()>1 && weekday()<7 && hour()==5 && minute()>0 )   // weekday 1 is Sunday
+	// check time
+	if ( hour()==5 && minute()>0 )   // weekday 1 is Sunday
 	{
 #ifdef _DEBUG_
 		Serial.println(F("checking dhw ... "));
@@ -82,15 +77,19 @@ void VitoClient_CheckDHW(void)
 		// do here the control
 		//	send_frame = {0x41, length, 0x00, command, adrr_high, addr_low, nr_bytes, CRC/data};	// CRC in read mode
 		//	41 07 00 02 60 00 02 f4 01 0x60
-		if ( pump>0 && hw_set>45 ) {
+		if ( hw_set>45 && minute()>10 ) {
 			// set hw temp back to normal
+#ifdef _DEBUG_
 			Serial.println(F("set hw back to 45°C."));
+#endif
 			File_LogMessage(PSTR("Vito DHW set back to 45°C."), NEW_ENTRY | ADD_NL | P_MEM); 
 			*(uint16_t*)(send_frame+7) = 450;
 			VitoClient_WriteParameter(temp_ww_soll);
 		} else if ( pump==0 && hw<40 && hw_set==45 ) {
 			// set hw temp to 50°C
+#ifdef _DEBUG_
 			Serial.println(F("set hw to 50°C."));
+#endif
 			File_LogMessage(PSTR("Vito DHW set to 50°C."), NEW_ENTRY | ADD_NL | P_MEM); 
 			*(uint16_t*)(send_frame+7) = 500;	// 50 °C
 			VitoClient_WriteParameter(temp_ww_soll);
@@ -125,7 +124,7 @@ byte VitoClient_ResetPoll(void)
 	byte i = MAX_RETRY, ret = 0;
 	while ( ret==0 && (i--)>0 ) {
 		while ( vito_client.available() ) vito_client.read();  // empty receive buffer
-		vito_client.waitForEOT(); //vito_client.flush();  // empty transmit buffer
+		vito_client.flush();  // empty transmit buffer
 		if ( VitoClient_Connect()!=1 ) continue;	// connection error
 #ifdef USE_RS485
   #if _DEBUG_>1
@@ -172,7 +171,7 @@ byte VitoClient_GetReply(byte chrs)
 //  Serial.println(F("wait for reply..."));
 	uint32_t time2 = millis();
 #ifdef USE_RS485
-	Serial1.waitForEOT(); //Serial1.flush();	// wait till all data was sent
+	Serial1.flush();	// wait till all data was sent
 	delayMicroseconds(300);
 	RS485_ENABLE_RX;
 	while ( ret==0 ) {

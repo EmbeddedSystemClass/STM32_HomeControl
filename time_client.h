@@ -1,9 +1,8 @@
 #ifndef TIME_CLIENT_H
 #define TIME_CLIENT_H
 
-#include <Time_lib.h>
-#include <Ethernet_STM.h>
-#include <EthernetUdp.h>
+#include <TimeLib.h>
+#include <Ethernet_STM32.h>
 
 void TimeClient_Init(void);
 //int ConnectToTimeServer(void);

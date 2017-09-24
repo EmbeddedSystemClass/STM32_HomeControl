@@ -2,7 +2,7 @@
 #ifndef _FILE_CLIENT_H_
 #define _FILE_CLIENT_H_
 
-#include <Ethernet_STM.h>
+#include <Ethernet_STM32.h>
 #include <SdFat.h>
 
 void FileClient_Check(void);

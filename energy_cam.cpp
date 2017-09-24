@@ -30,7 +30,7 @@ Power Down     WO					0x24		(write "1")
 ******************************************************************************/
 #include "energy_cam.h"
 #ifndef USE_RS485
- #include <Ethernet_STM.h>
+ #include <Ethernet_STM32.h>
 #endif
 #include "file_client.h"
 #include "vito.h"
@@ -221,7 +221,7 @@ void SendFrame(uint8_t fr_nr)
 	Serial1.write(0xFF^EC_ID);
 	Serial1.write(frame, 8);
 	// prepare to receive the answer
-	Serial1.waitForEOT(); //Serial1.flush();	// wait till all data was sent
+	Serial1.flush();	// wait till all data is sent
 	delayMicroseconds(300);
 	RS485_ENABLE_RX;
 #else

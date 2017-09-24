@@ -4,7 +4,7 @@
 ******************************************************************************/
 #include "sys_cfg.h"
 #include "dreambox.h"
-#include <Ethernet_STM.h>
+#include <Ethernet_STM32.h>
 #include "ether_server.h"
 #include "ether_client.h"
 #include "file_client.h"

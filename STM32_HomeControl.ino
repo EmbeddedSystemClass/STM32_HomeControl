@@ -1,9 +1,9 @@
 
 #include "sys_cfg.h"  // configure debug if necessary
 
-#include <Time_lib.h>
+#include <TimeLib.h>
 #include <SPI.h>
-#include <Ethernet_STM.h>
+#include <Ethernet_STM32.h>
 #include <SdFat.h>
 #include "ether_server.h"
 #include "time_client.h"
@@ -33,7 +33,6 @@ void setup()
 	Serial.println(F("\n\n***** Home Automation application started *****\n"));
 #endif
 
-	Ethernet_Init();
 	EtherServer_Init();
 	TimeClient_Init();
 	FileClient_Init(CS_SD_CARD);
@@ -42,49 +41,6 @@ void setup()
 	minute_old = 60;
 #if _DEBUG_>0
 	Serial.println(F("setup end."));
-#endif
-}
-/***********************************************************************************/
-void Ethernet_Init(void)
-{
-byte mymac[] = { 0x10,0x69,0x69,0x2D,0x30,0x40 };
-IPAddress myip(192,168,100, 58);
-IPAddress gateway(192,168,100, 1);
-IPAddress subnet(255, 255, 255, 0);
-//byte ETHERNET_RESET_PIN = 0;
-	// start the Ethernet connection:
-#if _DEBUG_>0
-	Serial.print(("Getting IP address using DHCP ... "));
-#endif
-	// reset Ethernet interface
-	ETHERNET_RESET_PIN_MODE_SET_TO_OUTPUT;  //      pinMode(ETHERNET_RESET_PIN, OUTPUT);
-	ETHERNET_RESET_PIN_SET_TO_LOW;  //    digitalWrite(ETHERNET_RESET_PIN,LOW);
-	delay(1);
-	ETHERNET_RESET_PIN_SET_TO_HIGH;  //    digitalWrite(ETHERNET_RESET_PIN,HIGH);
-	delay(100);
-	
-	Ethernet.init(ETHERNET_SPI_CS_PIN, SPISettings(18000000));
-
-	//  if ( Ethernet.begin(mymac, myip, gateway, subnet) == 0 ) {
-	if ( Ethernet.begin(mymac)==0 ) {
-#if _DEBUG_>0
-		Serial.print(F("failed! Setting static IP address ... "));
-#endif
-		// initialize the ethernet device not using DHCP:
-		Ethernet.begin(mymac, myip, gateway, subnet);
-	}
-#if _DEBUG_>0
-	Serial.print(F("done."));
-	// print your local IP address:
-	Serial.print(F(" My IP address: "));
-	//Serial.println(Ethernet.localIP());
-	for (byte thisByte = 0; thisByte < 4; thisByte++) {
-		// print the value of each byte of the IP address:
-		Serial.print(Ethernet.localIP()[thisByte], DEC);
-		Serial.print("."); 
-	}
-	Serial.println();
-	showSocketStatus();
 #endif
 }
 /***********************************************************************************/
@@ -97,9 +53,7 @@ int freeRam (void)
 /***********************************************************************************/
 void loop()
 {
-	WDG_RST;
 	// intervall check
-	//time_t t = now();
 	byte minute_now = minute();
 	// check incoming serial character
 #if _DEBUG_>0

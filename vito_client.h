@@ -3,7 +3,7 @@
 #define _VITO_CLIENT_H_
 
 #ifndef USE_RS485
- #include <Ethernet_STM.h>
+ #include <Ethernet_STM32.h>
  extern EthernetClient vito_client;
 #endif
 

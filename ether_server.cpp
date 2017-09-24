@@ -1,6 +1,6 @@
 #include "sys_cfg.h"
 #include <SPI.h>
-#include <Ethernet_STM.h>
+#include <Ethernet_STM32.h>
 #include <SdFat.h>
 #include "ether_server.h"
 #include "file_client.h"
@@ -20,14 +20,64 @@ byte allow;
 long accessTimeout;
 
 void EtherServer_ProcessData(EthernetClient cl);
+
+/***********************************************************************************/
+void Ethernet_Init(void)
+{
+byte mymac[] = { 0x10,0x69,0x69,0x2D,0x30,0x40 };
+IPAddress myip(192,168,100, 41);
+IPAddress gateway(192,168,100, 1);
+IPAddress subnet(255, 255, 255, 0);
+
+	// reset Ethernet interface
+	pinMode(ETHERNET_RESET_PIN, OUTPUT);
+	digitalWrite(ETHERNET_RESET_PIN, HIGH);
+	delay(10);
+	digitalWrite(ETHERNET_RESET_PIN, LOW);
+	delay(10);
+	digitalWrite(ETHERNET_RESET_PIN, HIGH);
+	delay(10);
+
+	Ethernet.init(ETHERNET_SPI_CS_PIN);
+
+	// start the Ethernet connection:
+#if _DEBUG_>0
+	Serial.print("Getting IP address using DHCP ... ");
+#endif
+	if ( Ethernet.begin(mymac)==0 ) {
+#if _DEBUG_>0
+		Serial.print("failed! Setting static IP address ... ");
+#endif
+		// initialize the ethernet device not using DHCP:
+		Ethernet.begin(mymac, myip, gateway, subnet);
+	}
+#if _DEBUG_>0
+	Serial.print(F("done."));
+	// print your local IP address:
+	Serial.print(F(" My IP address: "));
+	Serial.println(Ethernet.localIP());
+	//for (byte thisByte = 0; thisByte < 4; thisByte++) {
+	//	// print the value of each byte of the IP address:
+	//	Serial.print(Ethernet.localIP()[thisByte], DEC);
+	//	Serial.print("."); 
+	//}
+	Serial.println();
+	showSocketStatus();
+#endif
+}
+
 /*****************************************************************************/
 /*****************************************************************************/
 void EtherServer_Init(void)
 {
 #if _DEBUG_>0
+	Serial.println("Initializing the Ethernet interface...");
+#endif
+    Ethernet_Init();
+
+#if _DEBUG_>0
 	Serial.print(F("Initializing Ethernet server..."));
 #endif
-
 	my_server.begin();
 	s_ind = 0;
 	allow = 0;
@@ -81,13 +131,8 @@ void EtherServer_CheckForClient(void)
 	s_client.getRemoteIP(remoteip);
 #if _DEBUG_>0
 	Serial.print(F("---> request from: "));
-	for (byte bcount=0; bcount < 4; bcount++)
-	{
-		Serial.print(remoteip[bcount], DEC);
-		if (bcount<3) Serial.print(".");
-	}
-	Serial.println();
-//showSocketStatus();
+	Serial.println((IPAddress)remoteip);
+    showSocketStatus();
 #endif
 	// security check remote IP. search for the same ip in the local record (clients.txt)
 	if ( oldip == *(uint32_t*)remoteip ) {
@@ -129,12 +174,12 @@ void EtherServer_CheckForClient(void)
 		EtherServer_ProcessData(s_client);
 	}
 #if _DEBUG_>0
-//	showSocketStatus();
+	showSocketStatus();
 	Serial.println(("...stopping client..."));
 #endif
 	s_client.stop();
 #if _DEBUG_>0
-//	showSocketStatus();
+	showSocketStatus();
 	Serial.println(F("<--- client end."));
 #endif
 }
