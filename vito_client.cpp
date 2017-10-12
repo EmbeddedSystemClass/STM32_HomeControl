@@ -57,7 +57,7 @@ char * VitoClient_GetParameterValue(char * paramName)
 void VitoClient_CheckDHW(void)
 {
 	// check time
-	if ( hour()==5 && minute()>0 )   // weekday 1 is Sunday
+	if ( hour()==5 && minute()<20 )   // DHW production should end till 6:00 (due to lower energy cost)
 	{
 #ifdef _DEBUG_
 		Serial.println(F("checking dhw ... "));
@@ -77,7 +77,7 @@ void VitoClient_CheckDHW(void)
 		// do here the control
 		//	send_frame = {0x41, length, 0x00, command, adrr_high, addr_low, nr_bytes, CRC/data};	// CRC in read mode
 		//	41 07 00 02 60 00 02 f4 01 0x60
-		if ( hw_set>45 && minute()>10 ) {
+		if ( hw_set>45 && minute()>20 ) {
 			// set hw temp back to normal
 #ifdef _DEBUG_
 			Serial.println(F("set hw back to 45°C."));
