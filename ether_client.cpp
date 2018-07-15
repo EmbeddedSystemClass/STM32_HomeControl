@@ -8,9 +8,9 @@ ether_client_id_t clientID;	// should be set by caller before running EtherClien
 
 byte header, chunked, flush;
 struct chunk {
-	int size;
-	byte index;
+	uint32_t size;
 	byte head[4];
+	byte index;
 } chunk;
 #define cl_buf	s_buf
 #define cl_ind	s_ind
@@ -157,7 +157,7 @@ void ReceiveChunkedPayload(char c)
 				cl_ind = 0;
 			}
 			chunk.index = 0;	// end of chunk data. switch to receive chunk header
-			*(long *)chunk.head = 0;	// clear chunk header data
+			*(long *)&chunk.head = 0;	// clear chunk header data
 		}
 	}
 }
