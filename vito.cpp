@@ -304,9 +304,9 @@ uint8_t Parse4Bytes(void)
 		*cPtr++ = '-';
 	}
 	if ( vito_param.divid==10 )
-		sprintf_P(cPtr, PSTR("%02lu.%1u"), x/10, x%10);
+		sprintf(cPtr, "%02lu.%1u", x/10, (int)x%10);
 	else
-		sprintf_P(cPtr, PSTR("%02lu"), x);
+		sprintf(cPtr, "%02lu", x);
 	//  Serial.println(F("parsed long: ")); Serial.println((char*)rec_frame);
 	#undef x
 	return 4;
@@ -342,14 +342,14 @@ uint8_t ParseWrValue(uint8_t in)
 /*****************************************************************************/
 byte Build2Bytes(void)
 {	// nothing to do, data should be available in little-endian format
-	int16_t dt = *(int16_t*)&send_frame[7];
+	//int16_t dt = *(int16_t*)&send_frame[7];
 	return 2;	// written bytes
 }
 /*****************************************************************************/
 /*****************************************************************************/
 byte Build4Bytes(void)
 {	// nothing to do, data should be available in little-endian format
-	int32_t dt = *(int32_t*)&send_frame[7];
+	//int32_t dt = *(int32_t*)&send_frame[7];
 	return 4;	// written bytes
 }
 /*****************************************************************************/

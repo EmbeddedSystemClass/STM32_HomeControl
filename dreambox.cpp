@@ -46,8 +46,8 @@ byte Dreambox_ParsePayloadLine(void)
 {
 //<?xml version="1.0" encoding="UTF-8"?>
 	// check end of XML header line and remove the entire line from the buffer
-	char * p = strstr_P(s_buf, PSTR("?>"));
-	if ( p>0 ) {
+	char * p = strstr(s_buf, ("?>"));
+	if ( p>NULL ) {
 		p += 2; // set pointer to the string to copy
 		if ( *p==0 )	s_ind = 0;	// set pointer to the beginning of the buffer
 		else {
@@ -65,12 +65,12 @@ byte Dreambox_ParsePayloadLine(void)
 <e2timerlist>
 </e2timerlist>
 */
-				if ( strstr_P(s_buf, PSTR("</e2timerlist>")) ) {
+				if ( strstr(s_buf, ("</e2timerlist>")) ) {
 					reply |= END;
 					return 1;	// flush any further data
 				}
-				p = strstr_P(s_buf, PSTR("<e2timerlist>"));
-				if ( p>0 ) {
+				p = strstr(s_buf, ("<e2timerlist>"));
+				if ( p>NULL ) {
 					reply |= START;
 					// remove all data before this xml tag from buffer
 					p += 13; // set pointer to the end of this tag
@@ -107,8 +107,8 @@ void Dreambox_Init(void)
 	dm_device = DM800SE;
 	dm_state[DM800SE] = DM_OK;
 	dm_state[DM800] = DM_OK;
-	dm_ip[DM800SE] = (192,168,100,25);
-	dm_ip[DM800] = (192,168,100,44);
+	dm_ip[DM800SE] = IPAddress(192,168,100,25);
+	dm_ip[DM800] = IPAddress(192,168,100,44);
 }
 /*****************************************************************************/
 void Dreambox_GetReply(void)
@@ -126,7 +126,7 @@ void Dreambox_Disconnect(void)
 /*****************************************************************************/
 void Dreambox_Connect(void)
 {
-	int reply;
+	int reply = 0;
 #if _DEBUG_>0
 	Serial.print(("Connecting to "));
 	if (dm_device==DM800SE )
@@ -135,7 +135,7 @@ void Dreambox_Connect(void)
 		Serial.print(("DM800 ... "));
 #endif
 	// if you get a connection, report back via serial:
-	long timeout = millis() + 3000;  // time within to get reply
+	uint32_t timeout = millis() + 3000;  // time within to get reply
 	while (1) {
 		if ( millis()>timeout ) {  // if no answer received within the prescribed time
 			//time_client.stop();

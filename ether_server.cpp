@@ -246,7 +246,7 @@ void EtherServer_ProcessData(EthernetClient cl)
 		// POST /readfile=15-06-07.TXT HTTP/1.1
 		*(strchr(s_buf+5, ' ')) = 0;
 		// feasibility check
-		if ( strchr(s_buf+5, '=')>0 ) {
+		if ( strchr(s_buf+5, '=')!=NULL ) {
 			// check POST request
 			File_CheckPostRequest(cl);
 		}

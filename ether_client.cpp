@@ -21,7 +21,7 @@ void ParseHeaderLine(void)
 #if _DEBUG_>0
 	Serial.print(F("(received header line: ")); Serial.println(cl_buf);
 #endif
-	if ( strstr(cl_buf, ("chunked"))>0 ) {
+	if ( strstr(cl_buf, ("chunked"))!=NULL ) {
 		Serial.println(F("*** chunked payload detected ! ***"));
 		chunked = 1;
 		flush = 1;	// no more header data needed

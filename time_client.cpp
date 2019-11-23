@@ -342,11 +342,11 @@ typedef union {
 void TimeClient_UpdateFileString(void)
 {
     time_t t = now(); // store the current time in time variable t
-    sprintf_P(time_str, PSTR("%02i:%02i:%02i"), hour(t), minute(t), second(t));
-    sprintf_P(date_str, PSTR("%02i-%02i-%02i"), year(t)%100, month(t), day(t));
-    sprintf_P(file_str, PSTR("%s.txt"), date_str);
+    sprintf(time_str, "%02i:%02i:%02i", hour(t), minute(t), second(t));
+    sprintf(date_str, "%02i-%02i-%02i", year(t)%100, month(t), day(t));
+    sprintf(file_str, "%s.txt", date_str);
 #if _DEBUG_>0
-    Serial.print(("Current date and time: ")); Serial.print(date_str); Serial.print(' '); Serial.println(time_str);
+    Serial.print("Current date and time: "); Serial.print(date_str); Serial.print(' '); Serial.println(time_str);
 #endif
 }
 /****************************************************************************/

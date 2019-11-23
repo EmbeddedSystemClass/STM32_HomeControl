@@ -294,12 +294,12 @@ void EC_StoreResult(void)
 	//    long temp = *(long *)&frame[3];//)*10 + frame[6];
 	ocrReading.value = (*(uint32_t *)&frame[3])*10 + frame[8];
 	// load parameter name to read from record
-	strcpy_P(param_name, PSTR("Strom-H_abs"));
+	strcpy(param_name, ("Strom-H_abs"));
 	// feasibility tests
 	if ( ocrReading.value<256 ) {
 		// read last value from the log file
 		char * ptr = File_GetRecordedParameter(-1);  // last line, the 8-th parameter
-		if ( ptr>0 )
+		if ( ptr!=NULL )
 			ocrReading.value = atol(ptr);
 	}
 	if ( ec_new_day ) {
@@ -308,7 +308,7 @@ void EC_StoreResult(void)
 	}
 	// take the first recorded value of the day from the record file as reference
 	char * ptr = File_GetRecordedParameter(1);  // first line, the 8-th parameter
-	if ( ptr>0 )
+	if ( ptr!=NULL )
 		ocrReading.value0 = atol(ptr);
 
 	if ( ocrReading.value0<256 )
@@ -316,8 +316,8 @@ void EC_StoreResult(void)
 	// get diff
 	ocrReading.diff = ocrReading.value - ocrReading.value0;
 	// add OCR result to the param_readings
-	sprintf_P(&param_readings[strlen(param_readings)], PSTR(",%lu"), ocrReading.value);
-	sprintf_P(&param_readings[strlen(param_readings)], PSTR(",%u"), ocrReading.diff);
+	sprintf(&param_readings[strlen(param_readings)], ",%lu", ocrReading.value);
+	sprintf(&param_readings[strlen(param_readings)], ",%u", ocrReading.diff);
 #if _DEBUG_>0
 	Serial.print(F("OCR value: "));
 	Serial.print(ocrReading.value);
@@ -335,6 +335,7 @@ uint8_t EC_ReadValue(void)
 	EC_ReadOCRResult();
 	if ( ec_state>EC_OK )	return EC_Error();
 	EC_StoreResult();
+	return 0;
 }
 /*****************************************************************************/
 // get the serial data from the buffer

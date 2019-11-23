@@ -319,6 +319,8 @@ void VitoClient_ReadParameters(void)
 #if _DEBUG_>1
 		for (uint8_t i=0; i<len; i++) { uint8_t dat = send_frame[i]; if (dat<16) Serial.print('0'); Serial.print(dat, HEX); }
 		Serial.println();
+#else
+		(void)len;
 #endif
 
 		// get all reply bytes

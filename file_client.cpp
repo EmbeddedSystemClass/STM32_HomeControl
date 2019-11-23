@@ -22,7 +22,7 @@ static char old_readings[PARAM_READINGS_SIZE];
 //static byte temp_str[PARAM_READINGS_SIZE];
 /*****************************************************************************/
 /*****************************************************************************/
-uint8_t File_OpenFile(const char * fname, uint8_t oflags)
+uint8_t File_OpenFile(const char * fname, int oflags)
 {
 	if ( file.isOpen() )	file.close();
 #if _DEBUG_>1
@@ -266,7 +266,7 @@ char * GetLineParam(char * ptr, uint8_t nr)
 	//Serial.print(F("nr: ")); Serial.println(nr);
 	// get the parameter value which is the token after the counted comma
 	char * ptr1 = strtok(ptr, ",");  // token 0, is time value
-	while ( (ptr1 = strtok(NULL, ","))>0 && (--nr)>0 );
+	while ( (ptr1 = strtok(NULL, ","))!=NULL && (--nr)>0 );
 	return ptr1;
 }
 /*****************************************************************************/
@@ -304,7 +304,7 @@ void File_CheckDataToWrite(void)
 			if ( (*cPtr==',' || *cPtr<' ') ) {  // next char is comma or end of string ?
 				// found a missing param. copy old value to this position
 				char * p1 = GetLineParam(old_readings,nr);
-				if ( p1>0 ) {
+				if ( p1!=NULL ) {
 					strcpy(dPtr, p1);  // copy the old value to the new string
 					dPtr += strlen(p1);
 					//Serial.print(F(".. new str: ")); Serial.println(param_readings);
@@ -401,7 +401,7 @@ dir_t dir;
 		if ( DIR_IS_SUBDIR(&dir) ) {
 			File_BufAdd_P(PSTR(" - "));
 		} else { //if ( flags & LS_SIZE ) // print size if requested
-			sprintf_P(f_buf+f_ind, PSTR("%6u"), dir.fileSize); f_ind += 6;
+			sprintf_P(f_buf+f_ind, PSTR("%6lu"), (long int)dir.fileSize); f_ind += 6;
 		}
 		//client.print(F("</td><td>"));
 		File_BufAdd_P(PSTR("</td><td>"));
@@ -469,26 +469,25 @@ void File_LoadFileLine(void)
     file.fgets(f_buf+MINIMUM_BYTES, SERVER_BUFFER_MAX_SIZE-MINIMUM_BYTES, (char*)"\n");
   }
 }
-/*****************************************************************************/
-/*****************************************************************************/
+//-----------------------------------------------------------------------------
 void File_SendFile(EthernetClient cl)
 {
 	// check file type and add the corresponding description to the HTTP header
-	if ( strstr(PATH, (".png"))>0 ) {
+	if ( strstr(PATH, (".png"))!=NULL ) {
 		cl.println(F("HTTP/1.1 200 OK\r\nContent-Type: image/png\r\n"));
 	} else
-	if ( strstr(PATH, (".jpg"))>0 ) {
+	if ( strstr(PATH, (".jpg"))!=NULL ) {
 		cl.println(F("HTTP/1.1 200 OK\r\nContent-Type: image/jpeg\r\n"));
 	} else
-	if ( strstr(PATH, (".bmp"))>0 ) {
+	if ( strstr(PATH, (".bmp"))!=NULL ) {
 		cl.println(F("HTTP/1.1 200 OK\r\nContent-Type: image/bmp\r\n"));
 	} else
-	if ( strstr(PATH, (".gif"))>0 ) {
+	if ( strstr(PATH, (".gif"))!=NULL ) {
 		cl.println(F("HTTP/1.1 200 OK\r\nContent-Type: image/gif\r\n"));
-	} else {
-	if ( strstr(f_buf,(".htm"))>0 )
+	} else
+	if ( strstr(f_buf,(".htm"))!=NULL )
 		cl.println(F("HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\n"));
-	else
+	else {
 		cl.println(F("HTTP/1.1 200 OK\r\nContent-Type: text/plain; charset=utf-8\r\n"));
 		// send in ASCII mode files: txt, js, htm, 
 		while (1) {
@@ -511,7 +510,7 @@ void File_SendFile(EthernetClient cl)
 void File_CheckPostRequest(EthernetClient cl)
 {
 char * f_ptr;
-	if ( strstr(PATH, ("getfilelist="))>0 ) {
+	if ( strstr(PATH, ("getfilelist="))!=NULL ) {
 #if _DEBUG_>0
 		Serial.println(F("sending file list."));
 #endif
@@ -520,7 +519,7 @@ char * f_ptr;
 		if ( File_OpenFile(PATH, O_READ) )
 			File_SendFileList(cl);
 	} else
-	if ( ( f_ptr = strstr(PATH, ("readfile=")) )>0 ) {  //14-12-30.TXT)
+	if ( ( f_ptr = strstr(PATH, ("readfile=")) )!=NULL ) {  //14-12-30.TXT)
 		// send requested record file. check if file exists
 #if _DEBUG_>0
 		Serial.println(F("sending file."));
@@ -563,7 +562,7 @@ byte index = 0;
 		cl.println(F("HTTP/1.1 301 Moved Permanently\r\nLocation: web/index.htm\r\n"));
 		return;   // wait for next request with correct path
 	}
-	if ( strstr(PATH, ("/index.htm"))>0 )
+	if ( strstr(PATH, ("/index.htm"))!=NULL )
 		index = 1;
 	// remove leading "files" if it is there
 	if ( strncmp(PATH, ("files"), 5)==0 )
@@ -619,7 +618,7 @@ void File_GetFileLine(int line_nr)
 		return;
 	}
 	// file opened successfully
-	memset(f_buf, sizeof(f_buf), 0);  // init read buffer
+	memset(f_buf, 0, sizeof(f_buf));  // init read buffer
 	int line = 0;
 	if ( line_nr>=0 ) {	// read from the beginning
 		file.rewind();  // set to position zero
@@ -666,7 +665,7 @@ char * File_GetRecordedParameter(int line_nr)
 	byte i = 1;
 	// count the separating markers ',' in the string before the input param name
 	char * ptr = strtok(f_buf, ",");
-	while ( (ptr = strtok(NULL, ","))>0 && strcmp(ptr, param_name)!=0 )	i++;
+	while ( (ptr = strtok(NULL, ","))!=NULL && strcmp(ptr, param_name)!=0 )	i++;
 	//Serial.println(ptr);
 	if ( ptr==0 ) return 0;
 	File_GetRecordLine(line_nr);
